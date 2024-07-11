@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from 'react
 import React, { useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
+import Checkbox from '../Input/Checkbox'
+import { TaskType } from '@/types'
 
 interface TaskBoxProps {
   task: TaskType
@@ -11,10 +13,31 @@ export default function TaskBox({
   task
 }: TaskBoxProps ) {
   const [isOpen, setIsOpen] = useState(false)
+  const [isNotDone, setIsNotDone] = useState(task?.status === 'Not Done' ? true : false)
+  const [isPending, setIsPending] = useState(task?.status === 'Pending' ? true : false)
+  const [isDone, setIsDone] = useState(task?.status === 'Done' ? true : false)
   
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setIsOpen((prev) => !prev)
+  }
+
+  const handleIsNotDone = () => {
+    setIsNotDone(!isNotDone)
+    setIsPending(false)
+    setIsDone(false)
+  }
+
+  const handleIsPending = () => {
+    setIsPending(!isPending)
+    setIsNotDone(false)
+    setIsDone(false)
+  }
+
+  const handleIsDone = () => {
+    setIsDone(!isDone)
+    setIsNotDone(false)
+    setIsPending(false)
   }
 
   return (
@@ -25,7 +48,8 @@ export default function TaskBox({
     >
       <View
         style={{
-          gap: 2
+          gap: 10,
+          marginBottom: 5
         }}
       >
         <View
@@ -53,15 +77,27 @@ export default function TaskBox({
           </TouchableOpacity>
         </View>
 
-        <View>
-          <Text
-            style={{
-              color: Colors.PRIMARY_GRAY,
-              fontSize: 16
-            }}
-          >
-            Status
-          </Text>
+        <View 
+          style={{
+            flexDirection: 'row',
+            justifyContent: 'space-between'
+          }}
+        >
+          <Checkbox 
+            label='Not Done'
+            checked={isNotDone}
+            onClick={handleIsNotDone}
+          />
+          <Checkbox 
+            label='Pending'
+            checked={isPending}
+            onClick={handleIsPending}
+          />
+          <Checkbox 
+            label='Done'
+            checked={isDone}
+            onClick={handleIsDone}
+          />
         </View>
       </View>
 
@@ -118,7 +154,7 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.BG_GRAY,
     borderColor: Colors.SECONDARY_GRAY,
     borderWidth: 1,
-    borderRadius: 8
+    borderRadius: 6
   },
   subContainer: {
     paddingVertical: 5,
@@ -126,6 +162,6 @@ const styles = StyleSheet.create({
     backgroundColor: Colors.BG_GRAY,
     borderColor: Colors.SECONDARY_GRAY,
     borderWidth: 1,
-    borderRadius: 5,
+    borderRadius: 6,
   }
 })

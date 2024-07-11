@@ -20,7 +20,7 @@ export function GetStartedContextProvider({
   const [isFirstTime, setIsFirstTime] = useState(true)
   const [isLoading, setIsLoading] = useState(true)
 
-  const checkFirstTimeStatus = async () => {
+  const checkFirstTimeStatus = useCallback(async () => {
     try {
       const status = await AsyncStorage.getItem('firstTime');
       setIsFirstTime(status === null);
@@ -29,9 +29,9 @@ export function GetStartedContextProvider({
     } finally {
       setIsLoading(false);
     }
-  };
+  }, []);
 
-  const setFirstTimeStatus = async (value: boolean) => {
+  const setFirstTimeStatus = useCallback(async (value: boolean) => {
     try {
       setIsLoading(true);
       if (value === true) {
@@ -46,7 +46,7 @@ export function GetStartedContextProvider({
     } finally {
       setIsLoading(false);
     }
-  }
+  }, [])
 
   useEffect(() => {
     checkFirstTimeStatus();

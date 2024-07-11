@@ -122,7 +122,8 @@ export default function Index() {
           style={{
             color: '#fff',
             fontFamily: 'poppins-bold',
-            fontSize: 16
+            fontSize: 16,
+            letterSpacing: 1.5
           }}
         >
           Get Started

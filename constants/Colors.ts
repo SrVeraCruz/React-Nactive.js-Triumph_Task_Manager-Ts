@@ -23,5 +23,8 @@ export const Colors = {
   SECONDARY_GRAY: '#a6a6a6',
   DARK: '#212121',
   RED: '#d46a6a',
+  BLUE: '#4aaff7',
+  GREEN: '#52d988',
+  ORANGE: '#f58549',
   BG_GRAY: '#f5f5f5',
 };

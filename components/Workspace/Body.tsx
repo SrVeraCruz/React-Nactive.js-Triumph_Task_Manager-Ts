@@ -1,35 +1,42 @@
-import { View, Text, TouchableOpacity, FlatList, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
 import React from 'react'
 import { Colors } from '@/constants/Colors'
 import TaskBox from './TaskBox'
+import { useRouter } from 'expo-router'
 
 export default function Body() {
+  const router = useRouter()
 
   const taskList = [
     {
       id: 1,
       title: 'Task 1',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.'
+      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
+      status: 'Not Done'
     },
     {
       id: 2,
       title: 'Task 2',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.'
+      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
+      status: 'Pending'
     },
     {
       id: 3,
       title: 'Task 3',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.'
+      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
+      status: 'Not Done'
     },
     {
       id: 4,
       title: 'Task 4',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.'
+      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
+      status: 'Done'
     },
     {
       id: 5,
       title: 'Task 5',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.'
+      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
+      status: 'Done'
     },
   ]
 
@@ -55,7 +62,9 @@ export default function Body() {
         >
           #All Tasks
         </Text>
-        <TouchableOpacity>
+        <TouchableOpacity
+          onPress={() => router.push('/new-task')}
+        >
           <Text
             style={{
               color: Colors.PRIMARY,
