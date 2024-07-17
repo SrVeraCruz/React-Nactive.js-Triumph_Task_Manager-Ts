@@ -1,64 +1,37 @@
-import { View, Text, FlatList } from 'react-native'
+import { View, Text, FlatList, StyleSheet } from 'react-native'
 import React from 'react'
 import { Colors } from '@/constants/Colors'
 import DashBoardItemBox from '@/components/Home/DashBoardItemBox'
+import { DashboardItemType } from '@/types'
 
 export default function home() {
 
-  const dashboardList = [
+  const dashboardList: DashboardItemType[] = [
     {
       id: 1,
-      name: 'Workspace',
+      name: 'Espace de travail',
       icon: require('../assets/images/home.png'),
       url: '/workspace',
       color: Colors.BLUE
     },
     {
-      id: 2,
-      name: 'Board',
-      icon: require('../assets/images/star.png'),
-      url: '/home',
-      color: Colors.GREEN
-    },
-    {
       id: 3,
-      name: 'Add task',
+      name: 'Suivi des action',
       icon: require('../assets/images/add.png'),
-      url: '/new-task',
+      url: '/add-action',
       color: Colors.SECONDARY_GRAY
     },
   ]
 
   return (
-    <View
-      style={{
-        backgroundColor: '#fff',
-        height: '100%',
-        width: '100%',
-        padding: 20
-      }}
-    >
-      <Text
-        style={{
-          color: Colors.DARK,
-          fontFamily: 'poppins-bold',
-          fontSize: 34,
-          marginTop: 40,
-          marginBottom: 10
-        }}
-      >
+    <View style={styles.container}>
+      <Text style={styles.title}>
         Dashboard
       </Text>
 
       <View>
-        <Text
-          style={{
-            fontFamily: 'poppins-bold',
-            color: Colors.SECONDARY_GRAY,
-            fontSize: 16
-          }}
-        >
-          # Your spaces
+        <Text style={styles.subTitle}>
+          # Vos espaces
         </Text>
 
         <FlatList 
@@ -74,3 +47,24 @@ export default function home() {
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: '#fff',
+    height: '100%',
+    width: '100%',
+    padding: 20
+  }, 
+  title: {
+    color: Colors.DARK,
+    fontFamily: 'poppins-bold',
+    fontSize: 34,
+    marginTop: 40,
+    marginBottom: 10
+  }, 
+  subTitle: {
+    fontFamily: 'poppins-bold',
+    color: Colors.SECONDARY_GRAY,
+    fontSize: 16
+  }
+})

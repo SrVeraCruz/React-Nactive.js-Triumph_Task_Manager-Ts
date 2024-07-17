@@ -30,8 +30,8 @@ export default function Checkbox({
         style={{
           alignItems: 'center',
           justifyContent: 'center',
-          width: 24,
-          height: 24,
+          width: 20,
+          height: 20,
           borderWidth: 2,
           borderRadius: 4,
           borderColor: checked ? Colors.PRIMARY : Colors.SECONDARY_GRAY,
@@ -40,13 +40,15 @@ export default function Checkbox({
         {checked && (
           <MaterialCommunityIcons 
             name="check-bold" 
-            size={18} 
+            size={15} 
             color={Colors.PRIMARY}
           />
         )}
       </View>
       <Text
         style={{
+          marginTop: 2,
+          fontSize: 13,
           fontFamily: checked ? 'poppins-bold' : 'poppins',
           color: checked ? Colors.PRIMARY : Colors.SECONDARY_GRAY
         }}

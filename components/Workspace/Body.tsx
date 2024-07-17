@@ -1,13 +1,14 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native'
+import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
 import React from 'react'
 import { Colors } from '@/constants/Colors'
 import TaskBox from './TaskBox'
 import { useRouter } from 'expo-router'
+import { TaskType } from '@/types'
 
 export default function Body() {
   const router = useRouter()
 
-  const taskList = [
+  const taskList: TaskType[] = [
     {
       id: 1,
       title: 'Task 1',
@@ -40,60 +41,50 @@ export default function Body() {
     },
   ]
 
+  const handleAddTask = () => {
+    router.push('/add-action')
+  }
+
   return (
-    <ScrollView
-      style={{
-        padding: 20
-      }}
-    >
-      <View
-        style={{
-          flexDirection: 'row',
-          justifyContent: 'space-between',
-          marginBottom: 10
-        }}
-      >
-        <Text
-          style={{
-            fontFamily: 'poppins-bold',
-            fontSize: 18,
-            color: Colors.DARK
-          }}
-        >
-          #All Tasks
+    <ScrollView style={{padding: 20}}>
+      <View style={styles.container}>
+        <Text style={styles.title}>
+          # Toutes les tâches
         </Text>
         <TouchableOpacity
-          onPress={() => router.push('/new-task')}
+          onPress={handleAddTask}
         >
-          <Text
-            style={{
-              color: Colors.PRIMARY,
-              fontFamily: 'poppins-bold'
-            }}
-          >
-            +Add
+          <Text style={styles.addBtn}>
+            +Ajouter
           </Text>
         </TouchableOpacity>
       </View>
 
-      <View 
-        style={{
-          gap: 18
-        }}
-      >
-        {taskList.length 
+      <View style={{gap: 18}}>
+        {taskList.length > 0
           ? taskList.map((item, index) => (
-              <TaskBox 
-                key={index}
-                task={item}
-              />
+              <TaskBox key={index} task={item}/>
             ))
-          : <ActivityIndicator 
-              size={'large'}
-              color={Colors.PRIMARY}
-            />
+          : <ActivityIndicator size={'large'} color={Colors.PRIMARY}/>
       }
       </View>
     </ScrollView>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginBottom: 5
+  },
+  title: {
+    fontFamily: 'poppins-bold',
+    fontSize: 18,
+    color: Colors.DARK
+  },
+  addBtn: {
+    color: Colors.PRIMARY,
+    fontFamily: 'poppins-bold'
+  }
+})

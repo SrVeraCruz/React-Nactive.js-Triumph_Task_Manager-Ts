@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from 'react
 import React, { useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
-import Checkbox from '../Input/Checkbox'
+import Checkbox from '../Util/Input/Checkbox'
 import { TaskType } from '@/types'
 
 interface TaskBoxProps {

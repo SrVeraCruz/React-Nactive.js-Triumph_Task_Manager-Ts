@@ -9,6 +9,7 @@ import React, { useContext, useEffect } from 'react'
 import { Colors } from '@/constants/Colors'
 import { GetStartedContext } from '@/context/GetStartedContext';
 import { useRouter } from 'expo-router';
+import Button from '@/components/Util/Button/Button';
 
 export default function Index() {
   const context = useContext(GetStartedContext)
@@ -83,7 +84,7 @@ export default function Index() {
             fontSize: 13
           }}
         >
-          WELCOME TO THE
+          BIENVENU À TRIUMPH
         </Text>
         <Text
           style={{
@@ -97,7 +98,7 @@ export default function Index() {
       </View>
 
       <Image 
-        source={require('../assets/images/getStated-logo.png')}
+        source={require('../assets/images/getStarted-logo.png')}
         style={{
           height: 480,
           width: 330,
@@ -107,28 +108,9 @@ export default function Index() {
         }}
       />
 
-      <TouchableOpacity
-        onPress={hadleOnPress}
-        style={{
-          width: '100%',
-          borderColor: '#fff',
-          borderWidth: 1,
-          padding: 13,
-          borderRadius: 99,
-          alignItems: 'center',
-        }}
-      >
-        <Text
-          style={{
-            color: '#fff',
-            fontFamily: 'poppins-bold',
-            fontSize: 16,
-            letterSpacing: 1.5
-          }}
-        >
-          Get Started
-        </Text>
-      </TouchableOpacity>
+      <Button variant='outline' onPress={() => hadleOnPress()}>
+        On Commence
+      </Button>
     </View>
   );
 }

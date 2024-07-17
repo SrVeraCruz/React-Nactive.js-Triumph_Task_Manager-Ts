@@ -2,7 +2,7 @@ export type TaskType = {
   id: number,
   title: string,
   description: string,
-  status: string
+  status: 'Not Done' | 'Pending' | 'Done'
 }
 
 export type DashboardItemType = {

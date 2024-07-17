@@ -1,23 +1,14 @@
-import { View, Text, TextInput, TouchableOpacity } from 'react-native'
+import { View, Text, TextInput, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { Colors } from '@/constants/Colors'
-import { Entypo, Ionicons } from '@expo/vector-icons'
+import { Entypo, FontAwesome, Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 
 export default function Header() {
   const router = useRouter()
 
   return (
-    <View
-      style={{
-        backgroundColor: Colors.PRIMARY,
-        paddingHorizontal: 20,
-        paddingTop: 40,
-        paddingBottom: 25,
-        borderBottomLeftRadius: 20,
-        borderBottomRightRadius: 20
-      }}
-    >
+    <View style={styles.container}>
       <View
         style={{
           flexDirection: 'row',
@@ -33,7 +24,7 @@ export default function Header() {
               fontSize: 13
             }}
           >
-            Welcome
+            Bienvenu 
           </Text>
           <Text
             style={{
@@ -43,7 +34,7 @@ export default function Header() {
               marginTop: -8
             }}
           >
-            Your Workspace
+            Your Espace de travail
           </Text>
         </View>
         <TouchableOpacity
@@ -52,7 +43,7 @@ export default function Header() {
         >
           <Entypo 
             name="home" 
-            size={28} 
+            size={24} 
             color="white" 
           />
         </TouchableOpacity>
@@ -76,7 +67,7 @@ export default function Header() {
         />
 
         <TextInput 
-          placeholder='Search...'
+          placeholder='chercher...'
           style={{
             fontFamily: 'poppins',
             fontSize: 16,
@@ -85,6 +76,31 @@ export default function Header() {
           }}
         />
       </View>
+      <View style={styles.iconWrapper}>
+        <TouchableOpacity activeOpacity={0.6}>
+          <Ionicons name="list-sharp" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity activeOpacity={0.6}>
+          <FontAwesome name="filter" size={24} color="white" />
+        </TouchableOpacity>
+      </View>
     </View>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    backgroundColor: Colors.PRIMARY,
+    paddingHorizontal: 20,
+    paddingTop: 40,
+    paddingBottom: 10,
+    borderBottomLeftRadius: 20,
+    borderBottomRightRadius: 20
+  },
+  iconWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    gap: 10,
+    marginTop: 10
+  }
+})
