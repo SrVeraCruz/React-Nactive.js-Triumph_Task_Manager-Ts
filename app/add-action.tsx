@@ -1,10 +1,11 @@
-import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView } from 'react-native'
-import React, { useState } from 'react'
+import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, ToastAndroid } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { FontAwesome5, Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import Button from '@/components/Util/Button/Button'
-import { TaskType } from '@/types'
+import { SuiviDesActionType, TaskType } from '@/types'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 const defaultTask: TaskType[] = [
   {
@@ -16,9 +17,20 @@ const defaultTask: TaskType[] = [
 ]
 export default function AddTask() {
   const router = useRouter()
+  const [listSuiviDesActions, setListSuiviDesActions] = useState<SuiviDesActionType[]>([])
+  const [ligne, setLigne] = useState("")
+  const [cuturiere, setCuturiere] = useState("")
+  const [agent, setAgent] = useState("")
   const [tasks, setTasks] = useState(defaultTask)
 
-  const handleAddOtherTask = () => {
+  const getSuiviDesActions = useCallback(async () => {
+    const res = await AsyncStorage.getItem('suiviDesActions')
+    if(res) {
+      setListSuiviDesActions(JSON.parse(res))
+    }
+  }, [AsyncStorage])
+  
+  const handleAddOtherTask = useCallback(() => {
     const task: TaskType = {
       id: Date.now(),
       title: '',
@@ -29,13 +41,103 @@ export default function AddTask() {
     setTasks((prev) => (
       [...prev, task]
     ))
-  }
+  }, [])
 
-  const handleRemoveTask = (id: number) => {
+  const handleRemoveTask = useCallback((id: number) => {
+    if(tasks.length <= 1) {
+      return
+    }
     setTasks((prev) => {
       return prev.filter((task) => task.id !== id)
     })
-  }
+  }, [tasks])
+
+  const handleChangeTitle = useCallback((value: string, index: number) => {
+    setTasks((prev) => {
+      const prevTasks = [...prev]
+      prevTasks[index].title = value
+      return prevTasks
+    })
+  }, [])
+
+  const handleChangeDesc = useCallback((value: string, index: number) => {
+    setTasks((prev) => {
+      const prevTasks = [...prev]
+      prevTasks[index].description = value
+      return prevTasks
+    })
+  }, [])
+
+  const handleSubmit = useCallback(async () => {
+    if(!ligne) {
+      ToastAndroid.show(
+        "Voullez rentrer la ligne de couture",
+        ToastAndroid.BOTTOM
+      )
+      return
+    }
+    
+    if(!cuturiere) {
+      ToastAndroid.show(
+        "Voullez rentrer le numéro de la cuturiere",
+        ToastAndroid.BOTTOM
+      )
+      return
+    }
+    
+    if(!agent) {
+      ToastAndroid.show(
+        "Voullez rentrer le numéro d'Agent de methode",
+        ToastAndroid.BOTTOM
+      )
+      return
+    }
+
+    for(let i=0; i<tasks.length; i++) {
+      if(!tasks[i].title) {
+        ToastAndroid.show(
+          `Voullez saisir le titre de la tache ${i+1}`,
+          ToastAndroid.BOTTOM
+        )
+        return
+      }
+      if(!tasks[i].description) {
+        ToastAndroid.show(
+          `Voullez saisir la description de la tache ${i+1}`,
+          ToastAndroid.BOTTOM
+        )
+        return
+      }
+    }
+
+    const suiviDesAction: SuiviDesActionType = {
+      ligneCouture: ligne,
+      numeroCuturiere: cuturiere,
+      agentMethode: agent,
+      tasks
+    }
+
+    const updatedList = [...listSuiviDesActions, suiviDesAction];
+
+    setListSuiviDesActions(updatedList)
+
+    await AsyncStorage.setItem(
+      'suiviDesActions',
+      JSON.stringify(updatedList)
+    ).then(() => {
+      ToastAndroid.show("Ajouté avec sucess", ToastAndroid.BOTTOM)
+      router.push('/workspace')
+    }).catch(() => {
+      ToastAndroid.show(
+        "Une erreur s'est produite. Veuillez réessayer",
+        ToastAndroid.BOTTOM
+      )
+    })
+  }, [ligne, cuturiere, agent, ToastAndroid, tasks, AsyncStorage])
+
+  useEffect(() => {
+    getSuiviDesActions()
+  }, [getSuiviDesActions])
 
   return (
     <View style={styles.container}>
@@ -63,19 +165,31 @@ export default function AddTask() {
               <Text style={styles.label}>
                 Ligne de couture:
               </Text>
-              <TextInput style={styles.input}/>
+              <TextInput 
+                value={ligne}
+                onChangeText={(value) => setLigne(value)}
+                style={styles.input}
+              />
             </View>
             <View>
               <Text style={styles.label}>
                 Numéro de la cuturiere:
               </Text>
-              <TextInput style={styles.input}/>
+              <TextInput 
+                value={cuturiere}
+                onChangeText={(value) => setCuturiere(value)}
+                style={styles.input}
+              />
             </View>
             <View>
               <Text style={styles.label}>
-                Agent de Methode:
+                Agent de methode:
               </Text>
-              <TextInput style={styles.input}/>
+              <TextInput 
+                value={agent}
+                onChangeText={(value) => setAgent(value)}
+                style={styles.input}
+              />
             </View>
           </View>
           {tasks.map((task, index) => (
@@ -85,39 +199,52 @@ export default function AddTask() {
                 <Text style={styles.label}>
                   Tache {index+1}:
                 </Text>
-                <TouchableOpacity
-                  onPress={() => handleRemoveTask(task.id)}
-                >
-                  <Ionicons 
-                    name="close" 
-                    size={20} 
-                    color={Colors.DARK}
-                  />
-                </TouchableOpacity>
+                {tasks.length > 1 && (
+                  <TouchableOpacity
+                    onPress={() => handleRemoveTask(task.id)}
+                  >
+                    <Ionicons 
+                      name="close" 
+                      size={20} 
+                      color={Colors.DARK}
+                    />
+                  </TouchableOpacity>
+                )}
               </View>
               <View style={{gap: 10}}>
                 <TextInput 
                   placeholder='Titre'
                   style={styles.input}
-                />
+                  
+                  onChangeText={
+                    (value) => handleChangeTitle(value,index)
+                  }
+                  />
                 <TextInput 
                   placeholder='Description'
                   style={styles.textarea}
                   multiline={true}
                   numberOfLines={4}
+                  
+                  onChangeText={
+                    (value) => handleChangeDesc(value,index)
+                  }
                 />
-                <View style={styles.videoWrapper}>
-                  <TouchableOpacity style={styles.addVideoBtn}>
+                <TouchableOpacity 
+                  activeOpacity={0.3}
+                  style={styles.videoWrapper}
+                >
+                  <View style={styles.addVideoBtn}>
                     <FontAwesome5 
                       name="plus" 
                       size={14} 
                       color={Colors.PRIMARY_GRAY} 
                     />
-                  </TouchableOpacity>
+                  </View>
                   <Text style={styles.addVideoText}>
                     Ajouter video
                   </Text>
-                </View>
+                </TouchableOpacity>
               </View>
             </View>
           ))}
@@ -129,7 +256,7 @@ export default function AddTask() {
               +Autre tache
             </Text>
           </TouchableOpacity>
-          <Button variant='back' >
+          <Button variant='back' onPress={() => handleSubmit()} >
             Enregistrer action
           </Button>
         </View>

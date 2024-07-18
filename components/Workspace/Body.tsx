@@ -1,49 +1,42 @@
-import { View, Text, TouchableOpacity, ScrollView, ActivityIndicator, StyleSheet } from 'react-native'
-import React from 'react'
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
+import React, { useCallback, useEffect, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import TaskBox from './TaskBox'
 import { useRouter } from 'expo-router'
-import { TaskType } from '@/types'
+import { SuiviDesActionType, TaskType } from '@/types'
+import AsyncStorage from '@react-native-async-storage/async-storage'
 
 export default function Body() {
   const router = useRouter()
-
-  const taskList: TaskType[] = [
-    {
-      id: 1,
-      title: 'Task 1',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
-      status: 'Not Done'
-    },
-    {
-      id: 2,
-      title: 'Task 2',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
-      status: 'Pending'
-    },
-    {
-      id: 3,
-      title: 'Task 3',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
-      status: 'Not Done'
-    },
-    {
-      id: 4,
-      title: 'Task 4',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
-      status: 'Done'
-    },
-    {
-      id: 5,
-      title: 'Task 5',
-      description: 'Lorem lorem lorem lorem lorem lorem lorem.',
-      status: 'Done'
-    },
-  ]
+  const [listSuiviDesActions, setListSuiviDesActions] = useState<SuiviDesActionType[]>([])
+  const [taskList, setTaskList] = useState<TaskType[]>([])
 
   const handleAddTask = () => {
     router.push('/add-action')
   }
+
+  const getSuiviDesActions = useCallback(async () => {
+    setListSuiviDesActions([])
+    setTaskList([])
+
+    const res = await AsyncStorage.getItem('suiviDesActions')
+    if(res) {
+      const parsedRes: SuiviDesActionType[] = JSON.parse(res)
+      setListSuiviDesActions(parsedRes)
+
+      parsedRes.map((sAction) => {
+        sAction.tasks.map((task) => {
+          setTaskList((prev) => (
+            [...prev, task]
+          ))
+        })
+      })
+    }
+  }, [AsyncStorage])
+
+  useEffect(() => {
+    getSuiviDesActions()
+  }, [getSuiviDesActions])
 
   return (
     <ScrollView style={{padding: 20}}>
@@ -65,7 +58,11 @@ export default function Body() {
           ? taskList.map((item, index) => (
               <TaskBox key={index} task={item}/>
             ))
-          : <ActivityIndicator size={'large'} color={Colors.PRIMARY}/>
+          : (
+            <Text style={styles.noDataLabel}>
+              Aucune tache
+            </Text>
+          )
       }
       </View>
     </ScrollView>
@@ -86,5 +83,12 @@ const styles = StyleSheet.create({
   addBtn: {
     color: Colors.PRIMARY,
     fontFamily: 'poppins-bold'
-  }
+  },
+  noDataLabel: {
+    fontFamily: 'poppins-bold',
+    fontSize: 15,
+    color: Colors.PRIMARY_GRAY,
+    textAlign: 'center',
+    marginTop: '50%'
+  },
 })

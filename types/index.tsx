@@ -12,3 +12,10 @@ export type DashboardItemType = {
   url: string,
   color: string
 }
+
+export type SuiviDesActionType = {
+  ligneCouture: string,
+  numeroCuturiere: string,
+  agentMethode: any,
+  tasks: TaskType[],
+}
