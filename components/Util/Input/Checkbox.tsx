@@ -30,10 +30,10 @@ export default function Checkbox({
         style={{
           alignItems: 'center',
           justifyContent: 'center',
-          width: 20,
-          height: 20,
-          borderWidth: 2,
-          borderRadius: 4,
+          width: 19,
+          height: 19,
+          borderWidth: 1.5,
+          borderRadius: 3,
           borderColor: checked ? Colors.PRIMARY : Colors.SECONDARY_GRAY,
         }}
       >  

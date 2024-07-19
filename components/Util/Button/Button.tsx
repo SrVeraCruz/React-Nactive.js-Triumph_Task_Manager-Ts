@@ -3,7 +3,8 @@ import React from 'react'
 
 interface ButtonProps {
   variant: variant,
-  onPress?: () => void
+  onPress?: () => void,
+  disabled?: boolean,
   children: React.ReactNode
 }
 
@@ -12,15 +13,20 @@ type variant = 'outline' | 'back'
 export default function Button({
   variant,
   onPress,
+  disabled,
   children
 }: ButtonProps ) {
   return (
     <TouchableOpacity
       activeOpacity={0.6}
       onPress={onPress}
+      disabled={disabled}
       style={[
         variant === 'back' && styles.black,
-        variant === 'outline' && styles.outline
+        variant === 'outline' && styles.outline,
+        {
+          opacity: disabled ? 0.5 : 1
+        }
       ]}
     >
       <Text style={styles.text}>

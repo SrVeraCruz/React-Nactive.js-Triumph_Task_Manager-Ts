@@ -1,21 +1,23 @@
 import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from 'react-native'
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
 import Checkbox from '../Util/Input/Checkbox'
 import { TaskType } from '@/types'
+import { ListOfActionContext } from '@/context/ListOfActionContext'
 
 interface TaskBoxProps {
-  task: TaskType
+  task: TaskType,
 }
 
 export default function TaskBox({
   task
 }: TaskBoxProps ) {
+  const { removeTask } = useContext(ListOfActionContext)!
   const [isOpen, setIsOpen] = useState(false)
-  const [isNotDone, setIsNotDone] = useState(task?.status === 'Not Done' ? true : false)
-  const [isPending, setIsPending] = useState(task?.status === 'Pending' ? true : false)
-  const [isDone, setIsDone] = useState(task?.status === 'Done' ? true : false)
+  const [isNotDone, setIsNotDone] = useState(task?.status === 'Non fait' ? true : false)
+  const [isPending, setIsPending] = useState(task?.status === 'En cours' ? true : false)
+  const [isDone, setIsDone] = useState(task?.status === 'Fait' ? true : false)
   
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
@@ -61,17 +63,17 @@ export default function TaskBox({
         >
           <Text
             style={{
-              fontSize: 26,
+              fontSize: 24,
               fontFamily: 'poppins-bold',
               color: Colors.DARK
             }}
           >
             {task?.title}
           </Text>
-          <TouchableOpacity>
+          <TouchableOpacity onPress={() => removeTask(task.id)}>
             <Ionicons 
               name="trash-outline" 
-              size={24} 
+              size={22} 
               color={Colors.RED} 
             />
           </TouchableOpacity>
@@ -84,17 +86,17 @@ export default function TaskBox({
           }}
         >
           <Checkbox 
-            label='Not Done'
+            label='Non fait'
             checked={isNotDone}
             onClick={handleIsNotDone}
           />
           <Checkbox 
-            label='Pending'
+            label='En cours'
             checked={isPending}
             onClick={handleIsPending}
           />
           <Checkbox 
-            label='Done'
+            label='Fait'
             checked={isDone}
             onClick={handleIsDone}
           />

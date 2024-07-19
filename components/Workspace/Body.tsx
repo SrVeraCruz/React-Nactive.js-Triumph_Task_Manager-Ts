@@ -1,42 +1,17 @@
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
+import React, { useContext } from 'react'
 import { Colors } from '@/constants/Colors'
 import TaskBox from './TaskBox'
 import { useRouter } from 'expo-router'
-import { SuiviDesActionType, TaskType } from '@/types'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { ListOfActionContext } from '@/context/ListOfActionContext'
 
 export default function Body() {
   const router = useRouter()
-  const [listSuiviDesActions, setListSuiviDesActions] = useState<SuiviDesActionType[]>([])
-  const [taskList, setTaskList] = useState<TaskType[]>([])
+  const {isLoading, taskList}  = useContext(ListOfActionContext)!
 
   const handleAddTask = () => {
     router.push('/add-action')
   }
-
-  const getSuiviDesActions = useCallback(async () => {
-    setListSuiviDesActions([])
-    setTaskList([])
-
-    const res = await AsyncStorage.getItem('suiviDesActions')
-    if(res) {
-      const parsedRes: SuiviDesActionType[] = JSON.parse(res)
-      setListSuiviDesActions(parsedRes)
-
-      parsedRes.map((sAction) => {
-        sAction.tasks.map((task) => {
-          setTaskList((prev) => (
-            [...prev, task]
-          ))
-        })
-      })
-    }
-  }, [AsyncStorage])
-
-  useEffect(() => {
-    getSuiviDesActions()
-  }, [getSuiviDesActions])
 
   return (
     <ScrollView style={{padding: 20}}>
@@ -54,7 +29,13 @@ export default function Body() {
       </View>
 
       <View style={{gap: 18}}>
-        {taskList.length > 0
+        {isLoading ? (
+          <ActivityIndicator 
+            size={'large'}
+            color={Colors.PRIMARY}
+            style={{marginTop: 30}}
+          />
+        ):(taskList.length > 0
           ? taskList.map((item, index) => (
               <TaskBox key={index} task={item}/>
             ))
@@ -63,6 +44,7 @@ export default function Body() {
               Aucune tache
             </Text>
           )
+        )
       }
       </View>
     </ScrollView>

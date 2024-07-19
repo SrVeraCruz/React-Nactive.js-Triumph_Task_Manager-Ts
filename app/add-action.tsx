@@ -1,41 +1,34 @@
 import { View, Text, TouchableOpacity, StyleSheet, TextInput, ScrollView, ToastAndroid } from 'react-native'
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useContext, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { FontAwesome5, Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import Button from '@/components/Util/Button/Button'
 import { SuiviDesActionType, TaskType } from '@/types'
-import AsyncStorage from '@react-native-async-storage/async-storage'
+import { ListOfActionContext } from '@/context/ListOfActionContext'
 
 const defaultTask: TaskType[] = [
   {
     id: Date.now(),
     title: '',
     description: '',
-    status: 'Not Done'
+    status: 'Non fait'
   }
 ]
 export default function AddTask() {
   const router = useRouter()
-  const [listSuiviDesActions, setListSuiviDesActions] = useState<SuiviDesActionType[]>([])
+  const { updatedStatus, addSuiviDesAction } = useContext(ListOfActionContext)!
   const [ligne, setLigne] = useState("")
   const [cuturiere, setCuturiere] = useState("")
   const [agent, setAgent] = useState("")
   const [tasks, setTasks] = useState(defaultTask)
-
-  const getSuiviDesActions = useCallback(async () => {
-    const res = await AsyncStorage.getItem('suiviDesActions')
-    if(res) {
-      setListSuiviDesActions(JSON.parse(res))
-    }
-  }, [AsyncStorage])
   
   const handleAddOtherTask = useCallback(() => {
     const task: TaskType = {
       id: Date.now(),
       title: '',
       description: '',
-      status: 'Not Done'
+      status: 'Non fait'
     }
 
     setTasks((prev) => (
@@ -111,33 +104,28 @@ export default function AddTask() {
     }
 
     const suiviDesAction: SuiviDesActionType = {
+      id: Date.now(),
       ligneCouture: ligne,
       numeroCuturiere: cuturiere,
       agentMethode: agent,
       tasks
     }
 
-    const updatedList = [...listSuiviDesActions, suiviDesAction];
-
-    setListSuiviDesActions(updatedList)
-
-    await AsyncStorage.setItem(
-      'suiviDesActions',
-      JSON.stringify(updatedList)
-    ).then(() => {
+    await addSuiviDesAction(suiviDesAction).then(() => {
       ToastAndroid.show("Ajouté avec sucess", ToastAndroid.BOTTOM)
       router.push('/workspace')
-    }).catch(() => {
+      return
+    })
+
+    if(updatedStatus === 'error') {
       ToastAndroid.show(
         "Une erreur s'est produite. Veuillez réessayer",
         ToastAndroid.BOTTOM
       )
-    })
-  }, [ligne, cuturiere, agent, ToastAndroid, tasks, AsyncStorage])
+      return
+    }
 
-  useEffect(() => {
-    getSuiviDesActions()
-  }, [getSuiviDesActions])
+  }, [ligne, cuturiere, agent, tasks, addSuiviDesAction])
 
   return (
     <View style={styles.container}>
@@ -183,7 +171,7 @@ export default function AddTask() {
             </View>
             <View>
               <Text style={styles.label}>
-                Agent de methode:
+              Numéro d'agent de methode:
               </Text>
               <TextInput 
                 value={agent}
@@ -256,7 +244,11 @@ export default function AddTask() {
               +Autre tache
             </Text>
           </TouchableOpacity>
-          <Button variant='back' onPress={() => handleSubmit()} >
+          <Button 
+            
+            variant='back' 
+            onPress={() => handleSubmit()} 
+          >
             Enregistrer action
           </Button>
         </View>

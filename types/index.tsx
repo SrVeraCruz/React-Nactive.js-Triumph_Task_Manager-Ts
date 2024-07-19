@@ -2,7 +2,7 @@ export type TaskType = {
   id: number,
   title: string,
   description: string,
-  status: 'Not Done' | 'Pending' | 'Done'
+  status: 'Non fait' | 'En cours' | 'Fait'
 }
 
 export type DashboardItemType = {
@@ -14,6 +14,7 @@ export type DashboardItemType = {
 }
 
 export type SuiviDesActionType = {
+  id: number,
   ligneCouture: string,
   numeroCuturiere: string,
   agentMethode: any,
