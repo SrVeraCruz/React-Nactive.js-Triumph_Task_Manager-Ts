@@ -3,7 +3,7 @@ import React, { useContext, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
 import Checkbox from '../Util/Input/Checkbox'
-import { TaskType } from '@/types'
+import { TaskStatusType, TaskType } from '@/types'
 import { ListOfActionContext } from '@/context/ListOfActionContext'
 
 interface TaskBoxProps {
@@ -13,34 +13,22 @@ interface TaskBoxProps {
 export default function TaskBox({
   task
 }: TaskBoxProps ) {
-  const { removeTask } = useContext(ListOfActionContext)!
+  const { updateTask, removeTask } = useContext(ListOfActionContext)!
   const [isOpen, setIsOpen] = useState(false)
-  const [isNotDone, setIsNotDone] = useState(task?.status === 'Non fait' ? true : false)
-  const [isPending, setIsPending] = useState(task?.status === 'En cours' ? true : false)
-  const [isDone, setIsDone] = useState(task?.status === 'Fait' ? true : false)
+  const [status, setStatus] = useState(task.status)
   
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setIsOpen((prev) => !prev)
   }
 
-  const handleIsNotDone = () => {
-    setIsNotDone(!isNotDone)
-    setIsPending(false)
-    setIsDone(false)
+  const handleStatusChange = (newStatus: TaskStatusType) => {
+    if (status !== newStatus) {
+      setStatus(newStatus)
+      updateTask({ ...task, status: newStatus })
+    }
   }
 
-  const handleIsPending = () => {
-    setIsPending(!isPending)
-    setIsNotDone(false)
-    setIsDone(false)
-  }
-
-  const handleIsDone = () => {
-    setIsDone(!isDone)
-    setIsNotDone(false)
-    setIsPending(false)
-  }
 
   return (
     <TouchableOpacity
@@ -87,18 +75,18 @@ export default function TaskBox({
         >
           <Checkbox 
             label='Non fait'
-            checked={isNotDone}
-            onClick={handleIsNotDone}
+            checked={status === 'Non fait'}
+            onClick={() => handleStatusChange('Non fait')}
           />
           <Checkbox 
             label='En cours'
-            checked={isPending}
-            onClick={handleIsPending}
+            checked={status === 'En cours'}
+            onClick={() => handleStatusChange('En cours')}
           />
           <Checkbox 
             label='Fait'
-            checked={isDone}
-            onClick={handleIsDone}
+            checked={status === 'Fait'}
+            onClick={() => handleStatusChange('Fait')}
           />
         </View>
       </View>

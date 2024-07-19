@@ -1,8 +1,10 @@
+export type TaskStatusType = 'Non fait' | 'En cours' | 'Fait'
+
 export type TaskType = {
   id: number,
   title: string,
   description: string,
-  status: 'Non fait' | 'En cours' | 'Fait'
+  status: TaskStatusType
 }
 
 export type DashboardItemType = {

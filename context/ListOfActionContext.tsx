@@ -13,6 +13,7 @@ interface ListOfActionContextValue {
   isLoading: boolean, 
   updatedStatus: StatusUpdate, 
   addSuiviDesAction: (suiviDesAction: SuiviDesActionType) => Promise<void>,
+  updateTask: (updatedTask: TaskType) => Promise<void>,
   removeTask: (id: number) => void,
   taskList: TaskType[], 
   listSuiviDesActions: SuiviDesActionType[], 
@@ -68,6 +69,17 @@ export default function ListOfActionContextProvider({
     .catch(() => setUpdatedStatus('error'))
   }, [listSuiviDesActions, updateListOfActions])
 
+  const updateTask = useCallback(async (updatedTask: TaskType) => {
+    const updatedList = listSuiviDesActions.map(action => {
+      const updatedTasks = action.tasks.map(task => 
+        task.id === updatedTask.id ? updatedTask : task
+      )
+      return { ...action, tasks: updatedTasks }
+    })
+    
+    await updateListOfActions(updatedList)
+  }, [listSuiviDesActions, getSuiviByTaskId])
+
   const removeTask = useCallback(async (taskId: number) => {
     const suivi = getSuiviByTaskId(taskId)
     if(!suivi) {
@@ -104,6 +116,7 @@ export default function ListOfActionContextProvider({
         isLoading, 
         updatedStatus, 
         addSuiviDesAction,
+        updateTask,
         removeTask,
         taskList, 
         listSuiviDesActions, 
