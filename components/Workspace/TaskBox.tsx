@@ -1,9 +1,9 @@
 import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from 'react-native'
-import React, { useContext, useState } from 'react'
+import React, { useContext, useMemo, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
 import Checkbox from '../Util/Input/Checkbox'
-import { TaskStatusType, TaskType } from '@/types'
+import { TaskStatusValues, TaskType } from '@/types'
 import { ListOfActionContext } from '@/context/ListOfActionContext'
 
 interface TaskBoxProps {
@@ -13,7 +13,7 @@ interface TaskBoxProps {
 export default function TaskBox({
   task
 }: TaskBoxProps ) {
-  const { updateTask, removeTask } = useContext(ListOfActionContext)!
+  const { selectedFilter, updateTask, removeTask } = useContext(ListOfActionContext)!
   const [isOpen, setIsOpen] = useState(false)
   const [status, setStatus] = useState(task.status)
   
@@ -22,12 +22,21 @@ export default function TaskBox({
     setIsOpen((prev) => !prev)
   }
 
-  const handleStatusChange = (newStatus: TaskStatusType) => {
+  const handleStatusChange = (newStatus: TaskStatusValues) => {
     if (status !== newStatus) {
       setStatus(newStatus)
       updateTask({ ...task, status: newStatus })
     }
   }
+
+  const filterText = useMemo(() => {
+    let text = `${selectedFilter}: `
+    text += selectedFilter === 'Agent' ? task.agentMethode : ''
+    text += selectedFilter === 'Ligne' ? task?.ligneCouture : ''
+    text += selectedFilter === 'Operatrice' ? task?.numeroCuturiere : ''
+
+    return text
+  }, [selectedFilter])
 
 
   return (
@@ -36,43 +45,27 @@ export default function TaskBox({
       onPress={handlePress}
       activeOpacity={1}
     >
-      <View
-        style={{
-          gap: 10,
-          marginBottom: 5
-        }}
-      >
-        <View
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            justifyContent: 'space-between'
-          }}
-        >
-          <Text
-            style={{
-              fontSize: 24,
-              fontFamily: 'poppins-bold',
-              color: Colors.DARK
-            }}
-          >
-            {task?.title}
+      <View>
+        {selectedFilter !== 'Tous' && (
+          <Text style={styles.filterText}>
+            {filterText}
           </Text>
-          <TouchableOpacity onPress={() => removeTask(task.id)}>
-            <Ionicons 
-              name="trash-outline" 
-              size={22} 
-              color={Colors.RED} 
-            />
-          </TouchableOpacity>
-        </View>
-
-        <View 
-          style={{
-            flexDirection: 'row',
-            justifyContent: 'space-between'
-          }}
+        )}
+        <Text style={styles.taskTilte}>
+          {task?.title}
+        </Text>
+        <TouchableOpacity 
+          onPress={() => removeTask(task.id)}
+          style={styles.removeBtn}
         >
+          <Ionicons 
+            name="trash-outline" 
+            size={22} 
+            color={Colors.RED} 
+          />
+        </TouchableOpacity>
+
+        <View style={styles.checkboxWrapper}>
           <Checkbox 
             label='Non fait'
             checked={status === 'Non fait'}
@@ -92,43 +85,23 @@ export default function TaskBox({
       </View>
 
       {isOpen && (
-        <View
-          style={{
-            gap: 15,
-            marginTop: 15
-          }}
-        >
-          <View
-            style={ styles.subContainer }
-          >
-            <Text
-              style={{
-                color: Colors.PRIMARY_GRAY,
-                fontFamily: 'poppins-medium',
-                fontSize: 15
-
-              }}
-            >
-              {task?.description}
-            </Text>
-          </View>
-          <TouchableOpacity
-            style={{
-              width: 40,
-              height: 39,
-              borderColor: Colors.SECONDARY_GRAY,
-              borderWidth: 1.5,
-              borderRadius: 99,
-              alignItems: 'center',
-              justifyContent: 'center'
-            }}
-          >
-            <Ionicons 
-              name="play" 
-              size={20}
-              color={Colors.SECONDARY_GRAY} 
-            />
-          </TouchableOpacity>
+        <View style={styles.moreInfoWrapper}>
+          {task.comment && (
+            <View style={styles.subContainer}>
+              <Text style={styles.commentText}>
+                {task?.comment}
+              </Text>
+            </View>
+          )}
+          {task.video && (
+            <TouchableOpacity style={styles.playWrapper}>
+              <Ionicons 
+                name="play" 
+                size={20}
+                color={Colors.SECONDARY_GRAY} 
+              />
+            </TouchableOpacity>
+          )}
         </View>
       )}
     </TouchableOpacity>
@@ -139,19 +112,58 @@ export default function TaskBox({
 const styles = StyleSheet.create({
   container: {
     paddingVertical: 4,
-    paddingBottom: 10,
+    paddingBottom: 15,
     paddingHorizontal: 16,
     backgroundColor: Colors.BG_GRAY,
     borderColor: Colors.SECONDARY_GRAY,
     borderWidth: 1,
-    borderRadius: 6
+    borderRadius: 6,
+    position: 'relative'
   },
   subContainer: {
     paddingVertical: 5,
     paddingHorizontal: 10,
-    backgroundColor: Colors.BG_GRAY,
+    backgroundColor: "#fff",
     borderColor: Colors.SECONDARY_GRAY,
     borderWidth: 1,
-    borderRadius: 6,
+    borderRadius: 4,
+  },
+  removeBtn: {
+    position: 'absolute',
+    top: 6,
+    right: -6
+  },
+  filterText: {
+    fontSize: 15,
+    fontFamily: 'poppins-bold',
+    color: Colors.DARK
+  },
+  taskTilte: {
+    fontSize: 24,
+    fontFamily: 'poppins-bold',
+    color: Colors.DARK
+  },
+  checkboxWrapper: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 5
+  },
+  moreInfoWrapper: {
+    gap: 15,
+    marginTop: 15
+  },
+  commentText: {
+    color: Colors.PRIMARY_GRAY,
+    fontFamily: 'poppins-medium',
+    fontSize: 15
+  },
+  playWrapper: {
+    width: 40,
+    height: 39,
+    borderColor: Colors.SECONDARY_GRAY,
+    borderWidth: 1.5,
+    borderRadius: 99,
+    alignItems: 'center',
+    justifyContent: 'center'
   }
 })

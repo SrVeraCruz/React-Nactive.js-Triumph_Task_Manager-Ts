@@ -11,13 +11,17 @@ const defaultTask: TaskType[] = [
   {
     id: Date.now(),
     title: '',
-    description: '',
-    status: 'Non fait'
+    comment: '',
+    ligneCouture: '',
+    numeroCuturiere: '',
+    agentMethode: '',
+    status: 'Non fait',
+    createdAt: Date()
   }
 ]
 export default function AddTask() {
   const router = useRouter()
-  const { updatedStatus, addSuiviDesAction } = useContext(ListOfActionContext)!
+  const { updateStatus, addSuiviDesAction } = useContext(ListOfActionContext)!
   const [ligne, setLigne] = useState("")
   const [cuturiere, setCuturiere] = useState("")
   const [agent, setAgent] = useState("")
@@ -27,8 +31,12 @@ export default function AddTask() {
     const task: TaskType = {
       id: Date.now(),
       title: '',
-      description: '',
-      status: 'Non fait'
+      comment: '',
+      ligneCouture: '',
+      numeroCuturiere: '',
+      agentMethode: '',
+      status: 'Non fait',
+      createdAt: Date()
     }
 
     setTasks((prev) => (
@@ -56,7 +64,7 @@ export default function AddTask() {
   const handleChangeDesc = useCallback((value: string, index: number) => {
     setTasks((prev) => {
       const prevTasks = [...prev]
-      prevTasks[index].description = value
+      prevTasks[index].comment = value
       return prevTasks
     })
   }, [])
@@ -87,16 +95,13 @@ export default function AddTask() {
     }
 
     for(let i=0; i<tasks.length; i++) {
+      tasks[i].ligneCouture = ligne
+      tasks[i].numeroCuturiere = cuturiere
+      tasks[i].agentMethode = agent
+
       if(!tasks[i].title) {
         ToastAndroid.show(
           `Voullez saisir le titre de la tache ${i+1}`,
-          ToastAndroid.BOTTOM
-        )
-        return
-      }
-      if(!tasks[i].description) {
-        ToastAndroid.show(
-          `Voullez saisir la description de la tache ${i+1}`,
           ToastAndroid.BOTTOM
         )
         return
@@ -108,20 +113,22 @@ export default function AddTask() {
       ligneCouture: ligne,
       numeroCuturiere: cuturiere,
       agentMethode: agent,
-      tasks
+      tasks,
+      createdAt: Date()
     }
 
-    await addSuiviDesAction(suiviDesAction).then(() => {
+    await addSuiviDesAction(suiviDesAction)
+    .then(() => {
       ToastAndroid.show("Ajouté avec sucess", ToastAndroid.BOTTOM)
       router.push('/workspace')
       return
-    })
+    }) 
 
-    if(updatedStatus === 'error') {
+    if(updateStatus === 'error') {
       ToastAndroid.show(
         "Une erreur s'est produite. Veuillez réessayer",
         ToastAndroid.BOTTOM
-      )
+      ) 
       return
     }
 
@@ -181,7 +188,7 @@ export default function AddTask() {
             </View>
           </View>
           {tasks.map((task, index) => (
-            <View key={task.id} /*style={styles.taskWrapper}*/>
+            <View key={task.id}>
               <View style={styles.line} />
               <View style={styles.taskHeader}>
                 <Text style={styles.label}>
@@ -209,7 +216,7 @@ export default function AddTask() {
                   }
                   />
                 <TextInput 
-                  placeholder='Description'
+                  placeholder='Commentaire'
                   style={styles.textarea}
                   multiline={true}
                   numberOfLines={4}
@@ -295,12 +302,6 @@ const styles = StyleSheet.create({
     marginHorizontal: 'auto',
     marginVertical: 15
   },
-  // taskWrapper: {
-    // borderTopWidth: 1,
-    // borderColor: Colors.SECONDARY_GRAY,
-    // paddingTop: 15,
-    // marginTop: 15,
-  // },
   taskHeader: {
     justifyContent: 'space-between',
     alignItems: 'center',

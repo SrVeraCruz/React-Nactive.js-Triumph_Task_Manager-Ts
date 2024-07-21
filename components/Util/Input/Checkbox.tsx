@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
 import React from 'react'
 import { Colors } from '@/constants/Colors'
 import { MaterialCommunityIcons } from '@expo/vector-icons'
@@ -20,22 +20,15 @@ export default function Checkbox({
     <TouchableOpacity
       disabled={disabled}
       onPress={onClick}
-      style={{
-        flexDirection: 'row',
-        alignItems: 'center',
-        gap: 4,
-      }}
+      style={styles.container}
     >
       <View
-        style={{
-          alignItems: 'center',
-          justifyContent: 'center',
-          width: 19,
-          height: 19,
-          borderWidth: 1.5,
-          borderRadius: 3,
-          borderColor: checked ? Colors.PRIMARY : Colors.SECONDARY_GRAY,
-        }}
+        style={[
+          styles.checkbox,
+          {
+            borderColor: checked ? Colors.PRIMARY : Colors.SECONDARY_GRAY,
+          }
+        ]}
       >  
         {checked && (
           <MaterialCommunityIcons 
@@ -46,15 +39,37 @@ export default function Checkbox({
         )}
       </View>
       <Text
-        style={{
-          marginTop: 2,
-          fontSize: 13,
-          fontFamily: checked ? 'poppins-bold' : 'poppins',
-          color: checked ? Colors.PRIMARY : Colors.SECONDARY_GRAY
-        }}
+        style={[
+          styles.label,
+          {
+            fontFamily: checked ? 'poppins-bold' : 'poppins',
+            color: checked ? Colors.PRIMARY : Colors.SECONDARY_GRAY
+          }
+        ]}
       >
         {label}
       </Text>
     </TouchableOpacity>
   )
 }
+
+const styles = StyleSheet.create({
+  container: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 4,
+  },
+  checkbox: {
+    backgroundColor: '#fff',
+    alignItems: 'center',
+    justifyContent: 'center',
+    width: 19,
+    height: 19,
+    borderWidth: 1.5,
+    borderRadius: 3,
+  },
+  label: {
+    marginTop: 2,
+    fontSize: 13,
+  }
+})

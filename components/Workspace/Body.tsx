@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
-import React, { useContext } from 'react'
+import React, { useContext, useMemo } from 'react'
 import { Colors } from '@/constants/Colors'
 import TaskBox from './TaskBox'
 import { useRouter } from 'expo-router'
@@ -7,17 +7,30 @@ import { ListOfActionContext } from '@/context/ListOfActionContext'
 
 export default function Body() {
   const router = useRouter()
-  const {isLoading, taskList}  = useContext(ListOfActionContext)!
+  const {isLoading, taskList, isSearching, selectedFilter, filteredTasks} = useContext(ListOfActionContext)!
 
   const handleAddTask = () => {
     router.push('/add-action')
   }
 
+  const headlineTitle = useMemo(() => {
+    if(isSearching && selectedFilter !== 'Tous') {
+      return 'Filtrée par '+selectedFilter
+    }
+    
+    if(isSearching && selectedFilter === 'Tous') {
+      return 'Resultat de recherche'
+    }
+
+   return 'Toutes les tâches'  
+  
+  }, [isSearching, selectedFilter])
+
   return (
-    <ScrollView style={{padding: 20}}>
-      <View style={styles.container}>
+    <View>
+      <View style={styles.headline}>
         <Text style={styles.title}>
-          # Toutes les tâches
+          # {headlineTitle}
         </Text>
         <TouchableOpacity
           onPress={handleAddTask}
@@ -27,35 +40,50 @@ export default function Body() {
           </Text>
         </TouchableOpacity>
       </View>
-
-      <View style={{gap: 18}}>
-        {isLoading ? (
-          <ActivityIndicator 
-            size={'large'}
-            color={Colors.PRIMARY}
-            style={{marginTop: 30}}
-          />
-        ):(taskList.length > 0
-          ? taskList.map((item, index) => (
-              <TaskBox key={index} task={item}/>
-            ))
-          : (
-            <Text style={styles.noDataLabel}>
-              Aucune tache
-            </Text>
-          )
-        )
-      }
-      </View>
-    </ScrollView>
+      <ScrollView style={{paddingHorizontal: 20, zIndex: -1}}>
+        <View style={{gap: 18}}>
+          {isLoading ? (
+            <ActivityIndicator 
+              size={'large'}
+              color={Colors.PRIMARY}
+              style={{marginTop: 30}}
+            />
+          ):(isSearching && (
+            filteredTasks.length > 0 
+              ? filteredTasks.map((item, index) => (
+                  <TaskBox key={index} task={item}/>
+                )) 
+              : (
+                <Text style={styles.noDataLabel}>
+                  aucune resultat
+                </Text>
+              )
+          ))}
+        
+          {!isLoading && !isSearching && taskList.length > 0
+            ? taskList.map((item, index) => (
+                <TaskBox key={index} task={item}/>
+              ))
+            : (
+              <Text style={styles.noDataLabel}>
+                Aucune tache
+              </Text>
+            )
+          }
+        </View>
+        <View style={{marginBottom: 300}} />
+      </ScrollView>
+    </View>
   )
 }
 
 const styles = StyleSheet.create({
-  container: {
+  headline: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 5
+    marginHorizontal: 20,
+    paddingTop: 15,
+    zIndex: -1
   },
   title: {
     fontFamily: 'poppins-bold',
@@ -72,5 +100,5 @@ const styles = StyleSheet.create({
     color: Colors.PRIMARY_GRAY,
     textAlign: 'center',
     marginTop: '50%'
-  },
+  }
 })
