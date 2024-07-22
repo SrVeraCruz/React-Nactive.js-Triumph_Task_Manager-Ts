@@ -12,10 +12,9 @@ type StatusUpdate = 'loading' | 'error' | 'success' | null
 
 interface ListOfActionContextValue {
   isLoading: boolean, 
-  updateStatus: StatusUpdate, 
   addSuiviDesAction: (suiviDesAction: SuiviDesActionType) => Promise<void>,
   updateTask: (updatedTask: TaskType) => Promise<void>,
-  removeTask: (id: number) => void,
+  removeTask: (id: number) => Promise<void>,
   debouncedFetchResults: DebouncedFunc<(searchQuery: string) => void>,
   taskList: TaskType[], 
   isSearching: boolean
@@ -40,15 +39,15 @@ export default function ListOfActionContextProvider({
   const [selectedFilter, setSelectedFilter] = useState<FilterValues>('Tous')
   const [isSearching, setIsSearching] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
-  const [updateStatus, setUpdateStatus] = useState<StatusUpdate>(null) 
  
-  const getSuiviDesActions = useCallback(async () => { 
+  const getSuiviDesActions = useCallback(async (): Promise<void> => { 
     setIsLoading(true)
+    setListSuiviDesActions([])
     try {
       const res = await AsyncStorage.getItem('suiviDesActions')
       if (res) {
         const parsedRes: SuiviDesActionType[] = JSON.parse(res)
-        setListSuiviDesActions(parsedRes.reverse())
+        setListSuiviDesActions(parsedRes)
       }
     } catch (error) {
       console.error('Failed to fetch suivi des actions:', error)
@@ -57,67 +56,57 @@ export default function ListOfActionContextProvider({
     }
   }, [])
 
-  const updateListOfActions = useCallback(async (updatedList: SuiviDesActionType[]) => {  
-    // updatedList.map((action) => {
-    //   action.tasks.map((task) => {
-    //     console.log('upd: '+task.id) 
-    //     console.log('upd: '+task.title)
-    //   })
-    // }) 
-    try {
-      await AsyncStorage.setItem('suiviDesActions', JSON.stringify(updatedList)).then(() => {
-        setListSuiviDesActions(updatedList)
-      }) 
-    } catch (error) {
-      console.error('Failed to update suivi des actions:', error)  
-    }  
-  }, [])
-  
-  const getSuiviByTaskId = useCallback((id: number) => {
-    return listSuiviDesActions.find(action => action.tasks.some(task => task.id === id))
+  const getSuiviByTaskId = useCallback((id: number): SuiviDesActionType | null => {
+    return listSuiviDesActions.find(action => action.tasks.some(task => task.id === id)) || null
   }, [listSuiviDesActions])
 
-  const addSuiviDesAction = useCallback(async (suiviDesAction: SuiviDesActionType) => {
-    setUpdateStatus('loading')
+  const findExistingActionIndex = useCallback((
+    existingActions: SuiviDesActionType[],
+    newAction: SuiviDesActionType
+  ): number => {
+    return existingActions.findIndex((action) =>
+      action.ligneCouture === newAction.ligneCouture && 
+      action.agentMethode === newAction.agentMethode && 
+      action.numeroOperatrice === newAction.numeroOperatrice 
+    );
+  }, [])
 
-    let actionExists = false
-
-    const updatedList = listSuiviDesActions.map(action => {
-      if (
-        action.ligneCouture === suiviDesAction.ligneCouture && 
-        action.agentMethode === suiviDesAction.agentMethode && 
-        action.agentMethode === suiviDesAction.agentMethode
-      ) {
-        actionExists = true
-        return {
-          ...action,
-          tasks: [...action.tasks, ...suiviDesAction.tasks]
-        }
-      }
-      return action
-    })
-
-    if (!actionExists) {
-      updatedList.push(suiviDesAction)
+  const updateListOfActions = useCallback(async (updatedList: SuiviDesActionType[]): Promise<void> => {   
+    try {
+      await AsyncStorage.setItem('suiviDesActions', JSON.stringify(updatedList)).then(() => {
+        setListSuiviDesActions(updatedList) 
+      })  
+    } catch (error) {
+      console.error('Failed to update suivi des actions:', error)     
+    }  
+  }, []) 
+  
+  const addSuiviDesAction = useCallback(async (suiviDesAction: SuiviDesActionType): Promise<void> => {
+    const existingIndex = findExistingActionIndex(listSuiviDesActions, suiviDesAction)
+ 
+    let updatedList: SuiviDesActionType[] = []
+    if (existingIndex !== -1) {
+      updatedList = [...listSuiviDesActions];
+      updatedList[existingIndex].tasks = [...updatedList[existingIndex].tasks, ...suiviDesAction.tasks]
+    } else {
+      updatedList = [...listSuiviDesActions, suiviDesAction]
     }
+ 
+    await updateListOfActions(updatedList) 
+  }, [listSuiviDesActions, findExistingActionIndex, updateListOfActions])
 
-    updateListOfActions(updatedList)
-    .then(() => setUpdateStatus('success'))
-    .catch(() => setUpdateStatus('error'))
-}, [listSuiviDesActions, updateListOfActions])
-
-  const updateTask = useCallback(async (updatedTask: TaskType) => {
+  const updateTask = useCallback(async (updatedTask: TaskType): Promise<void> => {
     const updatedList = listSuiviDesActions.map(action => {
       const updatedTasks = action.tasks.map(task => 
         task.id === updatedTask.id ? updatedTask : task
-      )
+      ) 
       return { ...action, tasks: updatedTasks }
     })
     
     await updateListOfActions(updatedList)
-  }, [listSuiviDesActions, getSuiviByTaskId])
+  }, [listSuiviDesActions, updateListOfActions])
 
-  const removeTask = useCallback(async (taskId: number) => {
+  const removeTask = useCallback(async (taskId: number): Promise<void> => {
     const suivi = getSuiviByTaskId(taskId)
     if(!suivi) {
       ToastAndroid.show(
@@ -137,12 +126,22 @@ export default function ListOfActionContextProvider({
         }
       }
       return action
-  }).filter(action => action !== null)
+    }).filter(action => action !== null)  
     
     await updateListOfActions(updatedList)  
   }, [listSuiviDesActions, getSuiviByTaskId, updateListOfActions])
 
-  const fetchResults = useCallback((searchQuery: string) => {
+  const sortTasksByCreatedAt = useCallback((tasks: TaskType[]): TaskType[] => {
+    return tasks.sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+ 
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, []);
+  
+
+  const fetchResults = useCallback((searchQuery: string): void => {
     const searchResult: TaskType[] = []
     switch(selectedFilter) {
       case 'Tous':
@@ -155,9 +154,9 @@ export default function ListOfActionContextProvider({
           task.ligneCouture.includes(searchQuery) && searchResult.push(task)
         })
         break;
-      case 'Operatrice':
+      case 'Opératrice':
         taskList.filter((task) => {
-          task.numeroCuturiere.includes(searchQuery) && searchResult.push(task)
+          task.numeroOperatrice.includes(searchQuery) && searchResult.push(task)
         })
         break;
       case 'Agent':
@@ -167,7 +166,6 @@ export default function ListOfActionContextProvider({
         break; 
     }
  
-    
     setFilteredTasks(searchResult)   
   }, [taskList, selectedFilter]) 
  
@@ -178,17 +176,17 @@ export default function ListOfActionContextProvider({
   }, [getSuiviDesActions]) 
 
   useEffect(() => {
-    setTaskList([])
-
-    const tasks = listSuiviDesActions.flatMap(action => action.tasks)
-    setTaskList(tasks.reverse()) 
-  }, [listSuiviDesActions])
+    if(listSuiviDesActions.length > 0) {
+      setTaskList([])
+      const tasks = listSuiviDesActions.flatMap(action => action.tasks)
+      setTaskList(sortTasksByCreatedAt(tasks))
+    } 
+  }, [listSuiviDesActions]) 
 
   return (
     <ListOfActionContext.Provider
       value={{
         isLoading, 
-        updateStatus, 
         addSuiviDesAction,
         updateTask,
         removeTask,

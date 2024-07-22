@@ -84,16 +84,6 @@ export default function Header() {
             Your Espace de travail
           </Text>
         </View>
-        <TouchableOpacity
-          activeOpacity={0.6}
-          onPress={() => router.push('/home')}
-        >
-          <Entypo 
-            name="home" 
-            size={24} 
-            color="white" 
-          />
-        </TouchableOpacity>
       </View>
 
       <View
@@ -126,8 +116,15 @@ export default function Header() {
         />
       </View>
       <View style={styles.iconWrapper}>
-        <TouchableOpacity activeOpacity={0.6}>
-          <Ionicons name="list-sharp" size={24} color="white" />
+        <TouchableOpacity
+          activeOpacity={0.6}
+          onPress={() => router.push('/home')}
+        >
+          <Entypo 
+            name="home" 
+            size={24} 
+            color="white" 
+          />
         </TouchableOpacity>
         <TouchableOpacity 
           activeOpacity={0.6}
@@ -158,7 +155,7 @@ const styles = StyleSheet.create({
   iconWrapper: {
     position: 'relative',
     flexDirection: 'row',
-    justifyContent: 'flex-end',
+    justifyContent: 'space-between',
     gap: 10,
     marginTop: 10
   },

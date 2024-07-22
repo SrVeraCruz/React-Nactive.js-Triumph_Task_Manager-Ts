@@ -1,5 +1,5 @@
 export type TaskStatusValues = 'Non fait' | 'En cours' | 'Fait'
-export type FilterValues = 'Tous' | 'Ligne' | 'Operatrice' | 'Agent'
+export type FilterValues = 'Tous' | 'Ligne' | 'Opératrice' | 'Agent'
 
 export type TaskType = {
   id: number,
@@ -7,7 +7,7 @@ export type TaskType = {
   comment: string,
   video?: string,
   ligneCouture: string,
-  numeroCuturiere: string,
+  numeroOperatrice: string,
   agentMethode: string,
   status: TaskStatusValues,
   createdAt: string
@@ -24,7 +24,7 @@ export type DashboardItemType = {
 export type SuiviDesActionType = {
   id: number,
   ligneCouture: string,
-  numeroCuturiere: string,
+  numeroOperatrice: string,
   agentMethode: string,
   tasks: TaskType[],
   createdAt: string

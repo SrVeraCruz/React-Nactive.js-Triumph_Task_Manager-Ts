@@ -22,10 +22,10 @@ export default function TaskBox({
     setIsOpen((prev) => !prev)
   }
 
-  const handleStatusChange = (newStatus: TaskStatusValues) => {
+  const handleStatusChange = async (newStatus: TaskStatusValues) => {
     if (status !== newStatus) {
       setStatus(newStatus)
-      updateTask({ ...task, status: newStatus })
+      await updateTask({ ...task, status: newStatus })
     }
   }
 
@@ -33,7 +33,7 @@ export default function TaskBox({
     let text = `${selectedFilter}: `
     text += selectedFilter === 'Agent' ? task.agentMethode : ''
     text += selectedFilter === 'Ligne' ? task?.ligneCouture : ''
-    text += selectedFilter === 'Operatrice' ? task?.numeroCuturiere : ''
+    text += selectedFilter === 'Opératrice' ? task?.numeroOperatrice : ''
 
     return text
   }, [selectedFilter])
@@ -55,7 +55,7 @@ export default function TaskBox({
           {task?.title}
         </Text>
         <TouchableOpacity 
-          onPress={() => removeTask(task.id)}
+          onPress={async () => await removeTask(task.id)}
           style={styles.removeBtn}
         >
           <Ionicons 

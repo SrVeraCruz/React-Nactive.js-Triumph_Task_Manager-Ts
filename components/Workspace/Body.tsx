@@ -15,16 +15,16 @@ export default function Body() {
 
   const headlineTitle = useMemo(() => {
     if(isSearching && selectedFilter !== 'Tous') {
-      return 'Filtrée par '+selectedFilter
+      return `Filtrée par ${selectedFilter} (${filteredTasks.length})`
     }
     
     if(isSearching && selectedFilter === 'Tous') {
-      return 'Resultat de recherche'
+      return `Resultat de recherche (${taskList.length})`
     }
 
-   return 'Toutes les tâches'  
+   return `Toutes les tâches (${taskList.length})`
   
-  }, [isSearching, selectedFilter])
+  }, [isSearching, selectedFilter, filteredTasks, taskList])
 
   return (
     <View>

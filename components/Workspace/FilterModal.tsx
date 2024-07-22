@@ -10,49 +10,62 @@ interface FilterModalProps {
   style?: StyleProp<ViewStyle>
 }
 
+interface filterItemType {
+  id: number,
+  name: FilterValues,
+  action: ()=> void
+}
+
 export default function FilterModal({
   show,
-  onClose,
+  onClose, 
   style
 }: FilterModalProps ) {
   const { selectedFilter, setSelectedFilter } = useContext(ListOfActionContext)!
 
-  const handleFilterPress = (filter: FilterValues) => {
-    if(selectedFilter === filter) return
+  const filterItem: filterItemType[] = useMemo(() => [
+    {
+      id: 1,
+      name: 'Tous',
+      action: ()=> setSelectedFilter('Tous')
+    },
+    { 
+      id: 2,
+      name: 'Ligne',
+      action: ()=> setSelectedFilter('Ligne')
+    },
+    { 
+      id: 3,
+      name: 'Opératrice',
+      action: ()=> setSelectedFilter('Opératrice')
+    },
+    { 
+      id: 4,
+      name: 'Agent',
+      action: ()=> setSelectedFilter('Agent')
+    },
+  ], [])
+
+  // const handleFilterPress = (filter: FilterValues) => {
+  //   if(selectedFilter === filter) return
     
-    switch(filter) {
-      case 'Tous':
-        setSelectedFilter('Tous')
-        break;
-      case 'Ligne':
-        setSelectedFilter('Ligne')
-        break;
-      case 'Operatrice':
-        setSelectedFilter('Operatrice')
-        break;
-      case 'Agent':
-        setSelectedFilter('Agent')
-        break;
-    }
+  //   switch(filter) {
+  //     case 'Tous':
+  //       setSelectedFilter('Tous')
+  //       break;
+  //     case 'Ligne':
+  //       setSelectedFilter('Ligne')
+  //       break;
+  //     case 'Opératrice':
+  //       setSelectedFilter('Opératrice')
+  //       break;
+  //     case 'Agent':
+  //       setSelectedFilter('Agent')
+  //       break;
+  //   }
 
-    onClose && onClose()
-  }
-
-  const isTousSelected = useMemo(() => {
-    return selectedFilter === 'Tous' ? true : false 
-  }, [selectedFilter])
-
-  const isLigneSelected = useMemo(() => {
-    return selectedFilter === 'Ligne' ? true : false 
-  }, [selectedFilter])
-
-  const isOperatriceSelected = useMemo(() => {
-    return selectedFilter === 'Operatrice' ? true : false 
-  }, [selectedFilter])
-
-  const isAgentSelected = useMemo(() => {
-    return selectedFilter === 'Agent' ? true : false 
-  }, [selectedFilter])
+  //   onClose && onClose()
+  // }
 
   return (
     <>
@@ -77,17 +90,19 @@ export default function FilterModal({
         <Text style={styles.title}>
           Filter par:
         </Text>
-        <TouchableOpacity onPress={() => handleFilterPress('Tous')}>
-          <Text 
-            style={[
-              styles.filtre,
-              {fontFamily: isTousSelected ? 'poppins-bold' : 'poppins'}
-            ]}
-          >
-            Tous
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleFilterPress('Ligne')}>
+        {filterItem.map((item) => (
+          <TouchableOpacity key={item.id} onPress={item.action}>
+            <Text 
+              style={[
+                styles.filtre,
+                {fontFamily: selectedFilter === item.name ? 'poppins-bold' : 'poppins'}
+              ]}
+            >
+              {item.name}
+            </Text>
+          </TouchableOpacity>
+        ))}
+        {/* <TouchableOpacity onPress={() => handleFilterPress('Ligne')}>
           <Text 
             style={[
               styles.filtre,
@@ -97,7 +112,7 @@ export default function FilterModal({
             Ligne
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleFilterPress('Operatrice')}>
+        <TouchableOpacity onPress={() => handleFilterPress('Opératrice')}>
           <Text 
             style={[
               styles.filtre,
@@ -116,7 +131,7 @@ export default function FilterModal({
           >
             Agent
           </Text>
-        </TouchableOpacity>
+        </TouchableOpacity> */}
       </View>
     </>
   )
