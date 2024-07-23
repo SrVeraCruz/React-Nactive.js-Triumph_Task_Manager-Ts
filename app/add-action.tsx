@@ -7,10 +7,10 @@ import Button from '@/components/Util/Button/Button'
 import { SuiviDesActionType, TaskType } from '@/types'
 import { ListOfActionContext } from '@/context/ListOfActionContext'
 import * as ImagePicker from 'expo-image-picker';
-import VideoModal from '@/components/Util/VideoModal'
+import VideoModal from '@/components/AddAction/VideoModal'
 import { customAnimationSlow } from '@/constants/Variables'
 import useVideoManager from '@/hooks/useVideoManager'
-
+ 
 export default function AddTask() {
   const router = useRouter()
   const { addSuiviDesAction } = useContext(ListOfActionContext)!

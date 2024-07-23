@@ -1,7 +1,7 @@
 import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from 'react-native'
 import React from 'react'
 import { ResizeMode, Video } from 'expo-av'
-import Modal from './Modal'
+import Modal from '../Util/Modal'
 
 interface VideoModalProps {
   uri: string,
@@ -24,7 +24,7 @@ export default function VideoModal({
       style={style}
     >
       <View style={styles.container}>
-        <Video
+        <Video 
           source={{ uri: uri }} 
           style={styles.video}
           useNativeControls

@@ -38,7 +38,7 @@ export default function VideoModal({
             <Ionicons
               name="close" 
               size={23} 
-              color="white" 
+              color={Colors.DARK}
             />
           </TouchableOpacity>
         </View>
@@ -60,7 +60,7 @@ const styles = StyleSheet.create({
     zIndex: 97
   },
   wrapper: {
-    backgroundColor: Colors.DARK,
+    backgroundColor: Colors.BG_GRAY,
     elevation: 20,
     borderRadius: 8,
     overflow: 'hidden',

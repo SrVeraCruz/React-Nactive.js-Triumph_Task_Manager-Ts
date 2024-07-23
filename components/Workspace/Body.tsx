@@ -4,7 +4,7 @@ import { Colors } from '@/constants/Colors'
 import TaskBox from './TaskBox'
 import { useRouter } from 'expo-router'
 import { ListOfActionContext } from '@/context/ListOfActionContext'
-import VideoModal from '../Util/VideoModal'
+import VideoModal from '../AddAction/VideoModal'
 import { customAnimationSlow } from '@/constants/Variables'
 
 export default function Body() {

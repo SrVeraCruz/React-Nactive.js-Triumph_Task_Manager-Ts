@@ -19,7 +19,12 @@
       "adaptiveIcon": {
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
-      }
+      },
+      "permissions": [
+        "READ_EXTERNAL_STORAGE",
+        "WRITE_EXTERNAL_STORAGE"
+      ],
+      "package": "com.srveracruz.checklistapp"
     },
     "web": {
       "bundler": "metro",
@@ -31,6 +36,14 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {
+        "origin": false
+      },
+      "eas": {
+        "projectId": "fcbaf27f-5542-4445-9cc0-8c2bdc94c4d4"
+      }
     }
   }
 }

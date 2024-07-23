@@ -96,8 +96,10 @@ const styles = StyleSheet.create({
   },
   slideOut: {
     position: 'absolute',
-    minWidth: "1000%",
-    minHeight: '1000%',
+    top: '-999%',
+    right: '-999%',
+    minWidth: "9999999%",
+    minHeight: '9999999%',
     zIndex: 98,
   },
   title: {

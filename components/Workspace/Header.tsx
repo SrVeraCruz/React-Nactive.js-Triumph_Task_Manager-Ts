@@ -6,11 +6,13 @@ import { useRouter } from 'expo-router'
 import { ListOfActionContext } from '@/context/ListOfActionContext'
 import FilterModal from './FilterModal'
 import { customAnimation } from '@/constants/Variables'
+import OptionsModal from './OptionsModal'
 
 export default function Header() {
   const router = useRouter()  
   const [query, setQuery] = useState("")
-  const [isModalShow, setIsModalShow] = useState(false)
+  const [isFilterModalShow, setIsFilterModalShow] = useState(false)
+  const [isOptionsModalShow, setIsOptionsModalShow] = useState(false)
   const { 
     isSearching, 
     selectedFilter, 
@@ -31,7 +33,12 @@ export default function Header() {
 
   const handleFilterPress = () => {
     LayoutAnimation.configureNext(customAnimation)
-    setIsModalShow(!isModalShow)
+    setIsFilterModalShow(!isFilterModalShow)
+  }
+
+  const handleOptionsPress = () => {
+    LayoutAnimation.configureNext(customAnimation)
+    setIsOptionsModalShow(!isOptionsModalShow)
   }
 
   useEffect(() => {
@@ -119,18 +126,33 @@ export default function Header() {
             color="white" 
           />
         </TouchableOpacity>
-        <TouchableOpacity 
-          activeOpacity={0.6}
-          onPress={handleFilterPress}
-        >
-          <FontAwesome name="filter" size={24} color="white" />
-        </TouchableOpacity>
+        <View style={{gap: 10, flexDirection: 'row'}}>
+          <TouchableOpacity
+            activeOpacity={0.6}
+            style={{position: 'relative'}}
+            onPress={handleOptionsPress}
+          >
+            <Entypo name="list" size={24} color="white"/>
+            <OptionsModal 
+              show={isOptionsModalShow} 
+              onClose={() => setIsOptionsModalShow(false)}
+              style={styles.optionsModal}
+            />
+          </TouchableOpacity>
+          <TouchableOpacity 
+            activeOpacity={0.6}
+            style={{position: 'relative', zIndex: -1}}
+            onPress={handleFilterPress}
+          >
+            <FontAwesome name="filter" size={24} color="white" />
+            <FilterModal 
+              show={isFilterModalShow} 
+              onClose={() => setIsFilterModalShow(false)}
+              style={styles.filterModal}
+            />
+          </TouchableOpacity>
+        </View>
       </View>
-      <FilterModal 
-        show={isModalShow} 
-        onClose={() => setIsModalShow(false)}
-        style={styles.modal}
-      />
     </View>
   )
 }
@@ -152,10 +174,16 @@ const styles = StyleSheet.create({
     gap: 10,
     marginTop: 10
   },
-  modal: {
+  optionsModal: {
     position: 'absolute',
-    right: 40,
-    top: 170,
+    right: 20,
+    top: 28,
     minWidth: 130, 
-  }
+  },
+  filterModal: {
+    position: 'absolute',
+    right: 18,
+    top: 28,
+    minWidth: 130, 
+  },
 })

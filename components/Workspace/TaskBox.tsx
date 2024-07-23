@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from 'react-native'
+import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation, Alert } from 'react-native'
 import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
@@ -22,6 +22,22 @@ export default function TaskBox({
   const handlePress = () => {
     LayoutAnimation.configureNext(LayoutAnimation.Presets.easeInEaseOut)
     setIsOpen((prev) => !prev)
+  }
+
+  const handleOnDelete = async (id: number) => {
+    Alert.alert('Voullez vous supprimer?', 'Cette action n\'est pas revercible?', [
+      {
+        text: 'Annuler',
+        style: 'cancel'
+      },
+      {
+        text: 'Supprimer',
+        style: 'destructive',
+        onPress: async () => await removeTask(id).then(
+          () => isOpen ? setIsOpen(!isOpen) : ''
+        )
+      },
+    ])
   }
 
   const handleStatusChange = async (newStatus: TaskStatusValues) => {
@@ -61,7 +77,7 @@ export default function TaskBox({
           {task?.title}
         </Text>
         <TouchableOpacity 
-          onPress={async () => await removeTask(task.id)}
+          onPress={async () => await handleOnDelete(task.id)}
           style={styles.removeBtn}
         >
           <Ionicons 
