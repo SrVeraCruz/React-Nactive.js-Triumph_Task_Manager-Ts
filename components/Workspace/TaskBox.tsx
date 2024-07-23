@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, StyleSheet, LayoutAnimation } from 'react-native'
-import React, { useContext, useMemo, useState } from 'react'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import { Ionicons } from '@expo/vector-icons'
 import Checkbox from '../Util/Input/Checkbox'
@@ -8,10 +8,12 @@ import { ListOfActionContext } from '@/context/ListOfActionContext'
 
 interface TaskBoxProps {
   task: TaskType,
+  onPlay?: () => void
 }
 
 export default function TaskBox({
-  task
+  task,
+  onPlay
 }: TaskBoxProps ) {
   const { selectedFilter, updateTask, removeTask } = useContext(ListOfActionContext)!
   const [isOpen, setIsOpen] = useState(false)
@@ -28,6 +30,10 @@ export default function TaskBox({
       await updateTask({ ...task, status: newStatus })
     }
   }
+
+  const handleOnPlay = useCallback(() => {
+    onPlay && onPlay()
+  }, [onPlay])
 
   const filterText = useMemo(() => {
     let text = `${selectedFilter}: `
@@ -94,7 +100,10 @@ export default function TaskBox({
             </View>
           )}
           {task.video && (
-            <TouchableOpacity style={styles.playWrapper}>
+            <TouchableOpacity 
+              onPress={() => handleOnPlay()}
+              style={styles.playWrapper}
+            >
               <Ionicons 
                 name="play" 
                 size={20}
@@ -135,7 +144,7 @@ const styles = StyleSheet.create({
   },
   filterText: {
     fontSize: 15,
-    fontFamily: 'poppins-bold',
+    fontFamily: 'poppins-medium',
     color: Colors.DARK
   },
   taskTilte: {

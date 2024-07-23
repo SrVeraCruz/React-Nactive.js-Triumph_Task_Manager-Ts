@@ -5,6 +5,7 @@ import { Entypo, FontAwesome, Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { ListOfActionContext } from '@/context/ListOfActionContext'
 import FilterModal from './FilterModal'
+import { customAnimation } from '@/constants/Variables'
 
 export default function Header() {
   const router = useRouter()  
@@ -27,14 +28,6 @@ export default function Header() {
     setQuery(value)
     debouncedFetchResults(value)
   }
-
-  const customAnimation = {
-    duration: 100, 
-    create: {
-      type: LayoutAnimation.Types.easeInEaseOut,
-      property: LayoutAnimation.Properties.scaleXY,
-    }
-  };
 
   const handleFilterPress = () => {
     LayoutAnimation.configureNext(customAnimation)

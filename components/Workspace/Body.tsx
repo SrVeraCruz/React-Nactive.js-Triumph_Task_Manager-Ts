@@ -1,13 +1,23 @@
-import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator } from 'react-native'
-import React, { useContext, useMemo } from 'react'
+import { View, Text, TouchableOpacity, ScrollView, StyleSheet, ActivityIndicator, LayoutAnimation } from 'react-native'
+import React, { useCallback, useContext, useMemo, useState } from 'react'
 import { Colors } from '@/constants/Colors'
 import TaskBox from './TaskBox'
 import { useRouter } from 'expo-router'
 import { ListOfActionContext } from '@/context/ListOfActionContext'
+import VideoModal from '../Util/VideoModal'
+import { customAnimationSlow } from '@/constants/Variables'
 
 export default function Body() {
   const router = useRouter()
-  const {isLoading, taskList, isSearching, selectedFilter, filteredTasks} = useContext(ListOfActionContext)!
+  const [isVideoOpen, setIsVideoOpen] = useState<boolean>(false)
+  const [videoUri, setVideoUri] = useState<string>("")
+  const {
+    isLoading, 
+    taskList, 
+    isSearching, 
+    selectedFilter, 
+    filteredTasks
+  } = useContext(ListOfActionContext)!
 
   const handleAddTask = () => {
     router.push('/add-action')
@@ -26,8 +36,25 @@ export default function Body() {
   
   }, [isSearching, selectedFilter, filteredTasks, taskList])
 
+  const handleShowVideo = useCallback((uri?: string) => {
+    LayoutAnimation.configureNext(customAnimationSlow)
+    if(isVideoOpen || !uri) {
+      setVideoUri('')
+      setIsVideoOpen(false)
+      return
+    }
+
+    setVideoUri(uri!)
+    setIsVideoOpen(true)
+  }, [isVideoOpen])
+
   return (
-    <View>
+    <>
+      <VideoModal 
+        uri={encodeURI(videoUri)} 
+        show={isVideoOpen}
+        onClose={() => handleShowVideo()}
+      />
       <View style={styles.headline}>
         <Text style={styles.title}>
           # {headlineTitle}
@@ -62,7 +89,11 @@ export default function Body() {
         
           {!isLoading && !isSearching && taskList.length > 0
             ? taskList.map((item, index) => (
-                <TaskBox key={index} task={item}/>
+                <TaskBox 
+                  key={index} 
+                  task={item}
+                  onPlay={() => handleShowVideo(item.video)}
+                />
               ))
             : (
               <Text style={styles.noDataLabel}>
@@ -73,7 +104,7 @@ export default function Body() {
         </View>
         <View style={{marginBottom: 300}} />
       </ScrollView>
-    </View>
+    </>
   )
 }
 

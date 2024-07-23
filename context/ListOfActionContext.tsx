@@ -3,6 +3,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage'
 import React, { createContext, useCallback, useEffect, useState } from 'react'
 import { ToastAndroid } from 'react-native'
 import { debounce, DebouncedFunc } from 'lodash'
+import useVideoManager from '@/hooks/useVideoManager'
 
 interface ListOfActionContextProviderProps {
   children: React.ReactNode
@@ -33,16 +34,25 @@ export const ListOfActionContext = createContext<ListOfActionContextValue | null
 export default function ListOfActionContextProvider({
   children
 }: ListOfActionContextProviderProps ) {
+  const { saveVideoToFileSystem, deleteVideoFromFileSystem } = useVideoManager()
   const [listSuiviDesActions, setListSuiviDesActions] = useState<SuiviDesActionType[]>([])
   const [taskList, setTaskList] = useState<TaskType[]>([])
   const [filteredTasks, setFilteredTasks] = useState<TaskType[]>([])
   const [selectedFilter, setSelectedFilter] = useState<FilterValues>('Tous')
   const [isSearching, setIsSearching] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+
+  const sortTasksByCreatedAt = useCallback((tasks: TaskType[]): TaskType[] => {
+    return tasks.sort((a, b) => {
+      const dateA = new Date(a.createdAt);
+      const dateB = new Date(b.createdAt);
+ 
+      return dateB.getTime() - dateA.getTime();
+    });
+  }, []); 
  
   const getSuiviDesActions = useCallback(async (): Promise<void> => { 
     setIsLoading(true)
-    setListSuiviDesActions([])
     try {
       const res = await AsyncStorage.getItem('suiviDesActions')
       if (res) {
@@ -54,7 +64,7 @@ export default function ListOfActionContextProvider({
     } finally {  
       setIsLoading(false)
     }
-  }, [])
+  }, [saveVideoToFileSystem, sortTasksByCreatedAt])
 
   const getSuiviByTaskId = useCallback((id: number): SuiviDesActionType | null => {
     return listSuiviDesActions.find(action => action.tasks.some(task => task.id === id)) || null
@@ -116,31 +126,32 @@ export default function ListOfActionContextProvider({
       return
     } 
 
-    const updatedList = listSuiviDesActions.map(action => {
+    const updatedList = await Promise.all(listSuiviDesActions.map(async action => {
       if (action.id === suivi.id) {
-        const updatedTasks = action.tasks.filter(task => task.id !== taskId)
-        if (updatedTasks.length > 0) {
-          return { ...action, tasks: updatedTasks }
-        } else {
-          return null
-        }
+        const updatedTasks = await Promise.all(action.tasks.map(async task => {
+          if (task.id === taskId && task.video) {
+            await deleteVideoFromFileSystem(task.video);
+          }
+          return task.id !== taskId ? task : null;
+        })); 
+
+        const filteredTasks = updatedTasks.filter(task => task !== null); 
+
+        if (filteredTasks.length > 0) {
+          return { ...action, tasks: filteredTasks };
+        } else { 
+          return null; 
+        }  
       }
-      return action
-    }).filter(action => action !== null)  
-    
-    await updateListOfActions(updatedList)  
-  }, [listSuiviDesActions, getSuiviByTaskId, updateListOfActions])
+      return action; 
+    }));
 
-  const sortTasksByCreatedAt = useCallback((tasks: TaskType[]): TaskType[] => {
-    return tasks.sort((a, b) => {
-      const dateA = new Date(a.createdAt);
-      const dateB = new Date(b.createdAt);
+    const finalUpdatedList = updatedList.filter(action => action !== null);
  
-      return dateB.getTime() - dateA.getTime();
-    });
-  }, []);
+    await updateListOfActions(finalUpdatedList)  
+  }, [listSuiviDesActions, getSuiviByTaskId, deleteVideoFromFileSystem, updateListOfActions])
   
-
+ 
   const fetchResults = useCallback((searchQuery: string): void => {
     const searchResult: TaskType[] = []
     switch(selectedFilter) {
@@ -176,10 +187,10 @@ export default function ListOfActionContextProvider({
   }, [getSuiviDesActions]) 
 
   useEffect(() => {
+    setTaskList([])
     if(listSuiviDesActions.length > 0) {
-      setTaskList([])
       const tasks = listSuiviDesActions.flatMap(action => action.tasks)
-      setTaskList(sortTasksByCreatedAt(tasks))
+      setTaskList(sortTasksByCreatedAt(tasks))  
     } 
   }, [listSuiviDesActions]) 
 

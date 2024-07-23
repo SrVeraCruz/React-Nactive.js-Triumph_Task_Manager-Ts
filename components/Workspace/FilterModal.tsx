@@ -46,27 +46,6 @@ export default function FilterModal({
     },
   ], [])
 
-  // const handleFilterPress = (filter: FilterValues) => {
-  //   if(selectedFilter === filter) return
-    
-  //   switch(filter) {
-  //     case 'Tous':
-  //       setSelectedFilter('Tous')
-  //       break;
-  //     case 'Ligne':
-  //       setSelectedFilter('Ligne')
-  //       break;
-  //     case 'Opératrice':
-  //       setSelectedFilter('Opératrice')
-  //       break;
-  //     case 'Agent':
-  //       setSelectedFilter('Agent')
-  //       break;
-  //   }
-
-  //   onClose && onClose()
-  // }
-
   return (
     <>
       <TouchableOpacity 
@@ -102,36 +81,6 @@ export default function FilterModal({
             </Text>
           </TouchableOpacity>
         ))}
-        {/* <TouchableOpacity onPress={() => handleFilterPress('Ligne')}>
-          <Text 
-            style={[
-              styles.filtre,
-              {fontFamily: isLigneSelected ? 'poppins-bold' : 'poppins'}
-            ]}
-          >
-            Ligne
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleFilterPress('Opératrice')}>
-          <Text 
-            style={[
-              styles.filtre,
-              {fontFamily: isOperatriceSelected ? 'poppins-bold' : 'poppins'}
-            ]}
-          >
-            Opératrice
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity onPress={() => handleFilterPress('Agent')}>
-          <Text 
-            style={[
-              styles.filtre,
-              {fontFamily: isAgentSelected ? 'poppins-bold' : 'poppins'}
-            ]}
-          >
-            Agent
-          </Text>
-        </TouchableOpacity> */}
       </View>
     </>
   )
