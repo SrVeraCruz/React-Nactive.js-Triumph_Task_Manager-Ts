@@ -1,4 +1,4 @@
-import { View, Text, StyleSheet, TouchableOpacity, ViewStyle, StyleProp } from 'react-native'
+import { View, StyleSheet, ViewStyle, StyleProp } from 'react-native'
 import React from 'react'
 import { ResizeMode, Video } from 'expo-av'
 import Modal from '../Util/Modal'

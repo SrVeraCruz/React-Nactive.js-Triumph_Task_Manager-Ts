@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "checklist-app",
-    "slug": "checklist-app",
+    "name": "Triumph Manager",
+    "slug": "triumph-manager",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/images/icon.png",
@@ -20,11 +20,7 @@
         "foregroundImage": "./assets/images/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "permissions": [
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ],
-      "package": "com.srveracruz.checklistapp"
+      "package": "com.srveracruz.triumphmanager"
     },
     "web": {
       "bundler": "metro",
@@ -42,7 +38,7 @@
         "origin": false
       },
       "eas": {
-        "projectId": "fcbaf27f-5542-4445-9cc0-8c2bdc94c4d4"
+        "projectId": "3be50afd-e385-44ee-8144-5b43da8b20fc"
       }
     }
   }
