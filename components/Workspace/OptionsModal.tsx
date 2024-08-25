@@ -20,14 +20,20 @@ export default function OptionsModal({
   const { taskList: tasks } = useContext(ListOfActionContext)!
 
   const generateAndShareTasksFile = useCallback(async () => {
+    const getConvertedDate = (date: string) => {
+      return new Date(date)
+      .toISOString()
+      .slice(0,16)
+      .replace('T', '_')
+      .replace(':', 'h')
+    }
     try {
-      let fileContent = 'Id\tLigne\tOperatrice\tAgent\tTitre\tCommentaire\tVideo\n'
+      let fileContent = 'Id\t\tLigne\tOperatrice\tAgent\tTitre\tCommentaire\tVideo\t\tDate Debut\t\tDate Fin\n'
       fileContent += tasks.map(task => (
-        `${task.id}\t${task.ligneCouture}\t${task.numeroOperatrice}\t${task.agentMethode}\t${task.title}\t${task.comment}\t${task.video}\n`
+        `${task.id}\t${task.ligneCouture}\t${task.numeroOperatrice}\t\t${task.agentMethode}\t${task.title}\t${task.comment || ' '}\t\t${task.video?.split('/').pop() || ' '}\t\t${getConvertedDate(task.updatedAt || task.createdAt )}\t${task.finishedAt ? getConvertedDate(task.finishedAt) : 'Non Finisé'}\n`
       )).join('');
   
-      const date =  new Date()
-      const fileName = 'tasks_'+date.toISOString().slice(0,10)+'_'+date.getTime()+'.txt'
+      const fileName = 'tasks_'+getConvertedDate(Date())+'.txt'
 
       const filePath = FileSystem.documentDirectory + fileName;
   

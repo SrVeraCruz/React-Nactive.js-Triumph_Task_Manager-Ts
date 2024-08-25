@@ -106,6 +106,9 @@ export default function ListOfActionContextProvider({
   }, [listSuiviDesActions, findExistingActionIndex, updateListOfActions])
 
   const updateTask = useCallback(async (updatedTask: TaskType): Promise<void> => {
+    updatedTask.status === 'En cours' && (updatedTask.updatedAt = Date())
+    updatedTask.status === 'Fait' && (updatedTask.finishedAt = Date())
+
     const updatedList = listSuiviDesActions.map(action => {
       const updatedTasks = action.tasks.map(task => 
         task.id === updatedTask.id ? updatedTask : task

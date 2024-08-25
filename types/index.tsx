@@ -10,7 +10,9 @@ export type TaskType = {
   numeroOperatrice: string,
   agentMethode: string,
   status: TaskStatusValues,
-  createdAt: string
+  createdAt: string,
+  updatedAt?: string,
+  finishedAt?: string,
 }
 
 export type DashboardItemType = {
